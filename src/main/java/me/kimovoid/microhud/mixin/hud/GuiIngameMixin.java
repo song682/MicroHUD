@@ -64,20 +64,26 @@ public abstract class GuiIngameMixin extends GuiIngame {
                 PotionEffect eff = (PotionEffect) obj;
                 Potion potion = Potion.potionTypes[eff.getPotionID()];
 
+                int plateX = width - effectsX - 25;
+                int plateY = effectsY + 1;
+
                 GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                 this.mc.renderEngine.bindTexture(this.microHud_effectsPlateTexture);
-                this.drawTexturedModalRect(width - effectsX - 25, effectsY + 1, 0, 0, 24, 24);
+                this.drawTexturedModalRect(plateX, plateY, 0, 0, 24, 24);
+
+                // Let mods render their custom icon via Forge hook
+                potion.renderInventoryEffect(plateX, plateY, eff, this.mc);
 
                 if (potion.hasStatusIcon()) {
                     int l = potion.getStatusIconIndex();
                     this.mc.renderEngine.bindTexture(this.microHud_effectsTexture);
                     this.drawTexturedModalRect(width - effectsX - 22, effectsY + 4, l % 8 * 18, 198 + l / 8 * 18, 18, 18);
+                }
 
-                    if (MicroHUD.CONFIG.effectsHudTime) {
-                        String s = Potion.getDurationString(eff);
-                        GuiIngame.drawRect(width - effectsX - 23, effectsY + 15, width - effectsX - 3, effectsY + 23, -1155983079);
-                        this.fontrenderer.drawStringWithShadow(s, width - effectsX - 23, effectsY + 15,  eff.getDuration() <= 200 ? 13152175 : 11513775);
-                    }
+                if (MicroHUD.CONFIG.effectsHudTime) {
+                    String s = Potion.getDurationString(eff);
+                    GuiIngame.drawRect(width - effectsX - 23, effectsY + 15, width - effectsX - 3, effectsY + 23, -1155983079);
+                    this.fontrenderer.drawStringWithShadow(s, width - effectsX - 23, effectsY + 15, eff.getDuration() <= 200 ? 13152175 : 11513775);
                 }
 
                 effectsX += 25;
