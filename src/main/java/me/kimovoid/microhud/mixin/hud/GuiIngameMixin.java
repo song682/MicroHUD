@@ -63,22 +63,34 @@ public abstract class GuiIngameMixin extends GuiIngame {
             for (Object obj : this.mc.thePlayer.getActivePotionEffects()) {
                 PotionEffect eff = (PotionEffect) obj;
                 Potion potion = Potion.potionTypes[eff.getPotionID()];
+                if (potion == null) continue;
 
                 int plateX = width - effectsX - 25;
                 int plateY = effectsY + 1;
+                int iconX = width - effectsX - 22;
+                int iconY = effectsY + 4;
 
+                // Background plate
                 GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                 this.mc.renderEngine.bindTexture(this.microHud_effectsPlateTexture);
                 this.drawTexturedModalRect(plateX, plateY, 0, 0, 24, 24);
 
-                // Let mods render their custom icon via Forge hook
-                potion.renderInventoryEffect(plateX, plateY, eff, this.mc);
-
+                // Vanilla status icon first (same order as InventoryEffectRenderer),
+                // so modded potions can overdraw it below via renderInventoryEffect.
                 if (potion.hasStatusIcon()) {
-                    int l = potion.getStatusIconIndex();
+                    GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                     this.mc.renderEngine.bindTexture(this.microHud_effectsTexture);
-                    this.drawTexturedModalRect(width - effectsX - 22, effectsY + 4, l % 8 * 18, 198 + l / 8 * 18, 18, 18);
+                    int l = potion.getStatusIconIndex();
+                    this.drawTexturedModalRect(iconX, iconY, l % 8 * 18, 198 + l / 8 * 18, 18, 18);
                 }
+
+                // Forge 1.7.10 only provides renderInventoryEffect as the client
+                // render hook. Modded potions (Thaumcraft, Botania, ...) override it
+                // to bind their own texture and draw an 18x18 icon at (x+6, y+7).
+                // Pass (iconX-6, iconY-7) so the modded icon lands centered on our
+                // 24x24 plate at (iconX, iconY).
+                GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+                potion.renderInventoryEffect(iconX - 6, iconY - 7, eff, this.mc);
 
                 if (MicroHUD.CONFIG.effectsHudTime) {
                     String s = Potion.getDurationString(eff);

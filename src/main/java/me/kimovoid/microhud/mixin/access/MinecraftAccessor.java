@@ -8,5 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface MinecraftAccessor {
 
     @Accessor("debugFPS")
-    int getFps();
+    static int getFps() {
+        throw new AssertionError();
+    }
 }

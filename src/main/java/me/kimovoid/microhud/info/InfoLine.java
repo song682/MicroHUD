@@ -30,7 +30,7 @@ public class InfoLine {
     }
 
     int getY() {
-        return MathHelper.floor_double(this.mc.thePlayer.boundingBox.minY);
+        return MathHelper.floor_double(this.mc.thePlayer.posY);
     }
 
     int getZ() {
